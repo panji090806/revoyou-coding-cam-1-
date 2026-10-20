@@ -1,0 +1,978 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Daily Report — RevoU CAM</title>
+  <style>
+    /* ===== RESET & BASE ===== */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg-primary:    #0f1117;
+      --bg-card:       #1a1d27;
+      --bg-input:      #13151f;
+      --border:        #2a2d3e;
+      --accent:        #7c6af7;
+      --accent-hover:  #6355e0;
+      --accent-soft:   rgba(124, 106, 247, 0.12);
+      --danger:        #e05252;
+      --danger-hover:  #c73c3c;
+      --success:       #43c97e;
+      --text-primary:  #e8eaf6;
+      --text-secondary:#8b8fa8;
+      --text-muted:    #555870;
+      --tag-bg:        #252839;
+      --radius-sm:     8px;
+      --radius-md:     12px;
+      --radius-lg:     16px;
+      --shadow:        0 4px 24px rgba(0,0,0,0.4);
+      --transition:    0.2s ease;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      min-height: 100vh;
+      line-height: 1.6;
+    }
+
+    /* ===== SCROLLBAR ===== */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg-primary); }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 99px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+
+    /* ===== HEADER ===== */
+    header {
+      background: linear-gradient(135deg, #1a1d27 0%, #0f1117 100%);
+      border-bottom: 1px solid var(--border);
+      padding: 20px 24px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: blur(12px);
+    }
+
+    .header-inner {
+      max-width: 960px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .header-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-icon {
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(135deg, var(--accent), #a78bfa);
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+
+    .brand-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      letter-spacing: -0.02em;
+    }
+
+    .brand-sub {
+      font-size: 0.72rem;
+      color: var(--text-secondary);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .header-stats {
+      display: flex;
+      gap: 20px;
+    }
+
+    .stat-item {
+      text-align: center;
+    }
+
+    .stat-number {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--accent);
+      line-height: 1;
+    }
+
+    .stat-label {
+      font-size: 0.68rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    /* ===== LAYOUT ===== */
+    main {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 32px 24px 80px;
+    }
+
+    /* ===== SECTION TITLE ===== */
+    .section-label {
+      font-size: 0.72rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--accent);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .section-label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    /* ===== FORM CARD ===== */
+    .form-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 28px;
+      margin-bottom: 40px;
+      box-shadow: var(--shadow);
+    }
+
+    .form-title {
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .form-title span.tag {
+      font-size: 0.68rem;
+      padding: 3px 10px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      border-radius: 99px;
+      font-weight: 500;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+
+    .form-group.full { grid-column: 1 / -1; }
+
+    label {
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      letter-spacing: 0.03em;
+    }
+
+    input[type="date"],
+    input[type="text"],
+    textarea {
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      color: var(--text-primary);
+      border-radius: var(--radius-sm);
+      padding: 11px 14px;
+      font-size: 0.9rem;
+      font-family: inherit;
+      width: 100%;
+      transition: border-color var(--transition), box-shadow var(--transition);
+      outline: none;
+    }
+
+    input[type="date"]::-webkit-calendar-picker-indicator {
+      filter: invert(0.7);
+      cursor: pointer;
+    }
+
+    input:focus,
+    textarea:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-soft);
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 100px;
+      line-height: 1.6;
+    }
+
+    /* ===== BUTTONS ===== */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 20px;
+      border: none;
+      border-radius: var(--radius-sm);
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background var(--transition), transform var(--transition), box-shadow var(--transition);
+      font-family: inherit;
+      letter-spacing: 0.02em;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
+    .btn:active { transform: scale(0.97); }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #fff;
+    }
+    .btn-primary:hover { background: var(--accent-hover); box-shadow: 0 4px 16px rgba(124,106,247,0.35); }
+
+    .btn-danger {
+      background: transparent;
+      color: var(--danger);
+      border: 1px solid var(--danger);
+      padding: 7px 14px;
+      font-size: 0.78rem;
+    }
+    .btn-danger:hover { background: var(--danger); color: #fff; }
+
+    .btn-edit {
+      background: transparent;
+      color: var(--accent);
+      border: 1px solid var(--accent);
+      padding: 7px 14px;
+      font-size: 0.78rem;
+    }
+    .btn-edit:hover { background: var(--accent-soft); }
+
+    .btn-export {
+      background: transparent;
+      color: var(--success);
+      border: 1px solid var(--success);
+    }
+    .btn-export:hover { background: rgba(67,201,126,0.12); box-shadow: 0 4px 12px rgba(67,201,126,0.2); }
+
+    .btn-save-edit {
+      background: var(--success);
+      color: #0f1117;
+    }
+    .btn-save-edit:hover { background: #36b56d; }
+
+    .form-actions {
+      margin-top: 20px;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    /* ===== TOOLBAR ===== */
+    .reports-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .search-wrap {
+      position: relative;
+      flex: 1;
+      min-width: 180px;
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      font-size: 14px;
+      pointer-events: none;
+    }
+
+    #searchInput {
+      padding-left: 36px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      color: var(--text-primary);
+      border-radius: var(--radius-sm);
+      padding-top: 9px;
+      padding-bottom: 9px;
+      font-size: 0.85rem;
+      font-family: inherit;
+      outline: none;
+      width: 100%;
+      transition: border-color var(--transition);
+    }
+
+    #searchInput:focus { border-color: var(--accent); }
+
+    /* ===== REPORT CARD ===== */
+    .reports-list {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .report-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      box-shadow: var(--shadow);
+      transition: border-color var(--transition), transform var(--transition);
+      animation: cardIn 0.3s ease;
+    }
+
+    @keyframes cardIn {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .report-card:hover {
+      border-color: var(--accent);
+      transform: translateY(-2px);
+    }
+
+    .report-card-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+
+    .report-meta {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .report-date {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      font-weight: 500;
+      letter-spacing: 0.04em;
+    }
+
+    .report-topic {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      line-height: 1.3;
+    }
+
+    .report-card-actions {
+      display: flex;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    .report-divider {
+      height: 1px;
+      background: var(--border);
+      margin: 14px 0;
+    }
+
+    .report-section-title {
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--accent);
+      margin-bottom: 6px;
+    }
+
+    .report-text {
+      font-size: 0.88rem;
+      color: var(--text-secondary);
+      line-height: 1.7;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    /* ===== EDIT FORM (INLINE) ===== */
+    .edit-form {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .edit-form input,
+    .edit-form textarea {
+      background: var(--bg-input);
+    }
+
+    .edit-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    /* ===== EMPTY STATE ===== */
+    .empty-state {
+      text-align: center;
+      padding: 60px 24px;
+      color: var(--text-muted);
+    }
+
+    .empty-state .empty-icon {
+      font-size: 3rem;
+      margin-bottom: 12px;
+      opacity: 0.4;
+    }
+
+    .empty-state p {
+      font-size: 0.9rem;
+    }
+
+    /* ===== TOAST ===== */
+    #toast {
+      position: fixed;
+      bottom: 28px;
+      right: 28px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      color: var(--text-primary);
+      padding: 12px 20px;
+      border-radius: var(--radius-sm);
+      font-size: 0.85rem;
+      font-weight: 500;
+      box-shadow: var(--shadow);
+      z-index: 999;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      opacity: 0;
+      transform: translateY(12px);
+      transition: opacity 0.25s, transform 0.25s;
+      pointer-events: none;
+    }
+
+    #toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ===== MODAL EXPORT ===== */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.65);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 200;
+      padding: 24px;
+      backdrop-filter: blur(4px);
+    }
+
+    .modal-overlay.hidden { display: none; }
+
+    .modal {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 28px;
+      width: 100%;
+      max-width: 680px;
+      max-height: 85vh;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .modal-title {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .modal-close {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 1.2rem;
+      cursor: pointer;
+      padding: 4px;
+      border-radius: 6px;
+      line-height: 1;
+      transition: color var(--transition);
+    }
+    .modal-close:hover { color: var(--text-primary); }
+
+    #mdOutput {
+      flex: 1;
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      color: var(--text-secondary);
+      border-radius: var(--radius-sm);
+      padding: 16px;
+      font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
+      font-size: 0.8rem;
+      line-height: 1.7;
+      resize: none;
+      min-height: 320px;
+      max-height: 50vh;
+      overflow-y: auto;
+      outline: none;
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 640px) {
+      header { padding: 14px 16px; }
+      main   { padding: 20px 16px 60px; }
+
+      .form-card  { padding: 20px 16px; }
+      .form-grid  { grid-template-columns: 1fr; }
+
+      .report-card { padding: 18px 16px; }
+
+      .header-stats { gap: 16px; }
+      .stat-number  { font-size: 1.1rem; }
+
+      .modal        { padding: 20px 16px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ===== HEADER ===== -->
+<header>
+  <div class="header-inner">
+    <div class="header-brand">
+      <div class="brand-icon">📓</div>
+      <div>
+        <div class="brand-title">Daily Learning Report</div>
+        <div class="brand-sub">RevoU Coding Camp</div>
+      </div>
+    </div>
+    <div class="header-stats">
+      <div class="stat-item">
+        <div class="stat-number" id="statTotal">0</div>
+        <div class="stat-label">Laporan</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number" id="statDays">0</div>
+        <div class="stat-label">Hari</div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ===== MAIN ===== -->
+<main>
+
+  <!-- FORM -->
+  <div class="section-label">✏️ Tambah Laporan Baru</div>
+  <div class="form-card" id="formCard">
+    <div class="form-title">
+      Isi Laporan Harian
+      <span class="tag">RevoU CAM</span>
+    </div>
+
+    <div class="form-grid">
+      <div class="form-group">
+        <label for="inputDate">📅 Hari / Tanggal</label>
+        <input type="date" id="inputDate" />
+      </div>
+
+      <div class="form-group">
+        <label for="inputTopic">📚 Materi / Topik Pelajaran</label>
+        <input type="text" id="inputTopic" placeholder="cth: HTML Dasar, Flexbox, Git..." />
+      </div>
+
+      <div class="form-group full">
+        <label for="inputSummary">📝 Rangkuman Pembelajaran</label>
+        <textarea id="inputSummary" rows="4" placeholder="Apa yang kamu pelajari hari ini? Jelaskan dengan singkat..."></textarea>
+      </div>
+
+      <div class="form-group full">
+        <label for="inputObstacle">🚧 Kendala &amp; Solusi</label>
+        <textarea id="inputObstacle" rows="3" placeholder="Hambatan yang ditemui dan bagaimana cara mengatasinya..."></textarea>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button class="btn btn-primary" onclick="saveReport()">💾 Simpan Laporan</button>
+      <button class="btn btn-export" onclick="openExportModal()">📄 Export Markdown</button>
+    </div>
+  </div>
+
+  <!-- REPORTS LIST -->
+  <div class="reports-toolbar">
+    <div class="section-label" style="margin-bottom:0;flex:none;">📋 Daftar Laporan</div>
+    <div class="search-wrap">
+      <span class="search-icon">🔍</span>
+      <input type="text" id="searchInput" placeholder="Cari topik atau materi..." oninput="renderReports()" />
+    </div>
+  </div>
+
+  <div class="reports-list" id="reportsList"></div>
+</main>
+
+<!-- ===== EXPORT MODAL ===== -->
+<div class="modal-overlay hidden" id="exportModal" onclick="closeExportModal(event)">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <div class="modal-title">📄 Export ke Markdown</div>
+      <button class="modal-close" onclick="closeExportModal()">✕</button>
+    </div>
+    <p style="font-size:0.82rem;color:var(--text-secondary);">
+      Salin teks di bawah ini, lalu tempel ke file <code style="background:var(--tag-bg);padding:2px 6px;border-radius:4px;font-size:0.78rem;">README.md</code> GitHub-mu.
+    </p>
+    <textarea id="mdOutput" readonly></textarea>
+    <div class="modal-actions">
+      <button class="btn btn-primary" onclick="copyMarkdown()">📋 Salin Semua</button>
+      <button class="btn btn-export" onclick="downloadMarkdown()">⬇️ Unduh .md</button>
+      <button class="btn btn-edit" onclick="closeExportModal()">Tutup</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== TOAST ===== -->
+<div id="toast">
+  <span id="toastIcon">✅</span>
+  <span id="toastMsg">Berhasil!</span>
+</div>
+
+<!-- ===== SCRIPT ===== -->
+<script>
+  // ─── STORAGE HELPERS ─────────────────────────────────────────────────────────
+  const STORAGE_KEY = 'revou_daily_reports';
+
+  function getReports() {
+    try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; }
+    catch { return []; }
+  }
+
+  function setReports(data) {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  }
+
+  // ─── TOAST ───────────────────────────────────────────────────────────────────
+  let toastTimer;
+  function showToast(msg, icon = '✅') {
+    clearTimeout(toastTimer);
+    const toast = document.getElementById('toast');
+    document.getElementById('toastMsg').textContent = msg;
+    document.getElementById('toastIcon').textContent = icon;
+    toast.classList.add('show');
+    toastTimer = setTimeout(() => toast.classList.remove('show'), 2800);
+  }
+
+  // ─── STATS ───────────────────────────────────────────────────────────────────
+  function updateStats() {
+    const reports = getReports();
+    document.getElementById('statTotal').textContent = reports.length;
+    const uniqueDays = new Set(reports.map(r => r.date)).size;
+    document.getElementById('statDays').textContent = uniqueDays;
+  }
+
+  // ─── SAVE REPORT ─────────────────────────────────────────────────────────────
+  function saveReport() {
+    const date     = document.getElementById('inputDate').value.trim();
+    const topic    = document.getElementById('inputTopic').value.trim();
+    const summary  = document.getElementById('inputSummary').value.trim();
+    const obstacle = document.getElementById('inputObstacle').value.trim();
+
+    if (!date || !topic) {
+      showToast('Tanggal dan Topik wajib diisi!', '⚠️');
+      return;
+    }
+
+    const reports = getReports();
+    const newReport = {
+      id:       Date.now().toString(),
+      date,
+      topic,
+      summary,
+      obstacle,
+      createdAt: new Date().toISOString()
+    };
+
+    reports.unshift(newReport);
+    setReports(reports);
+
+    // Reset form
+    document.getElementById('inputDate').value    = '';
+    document.getElementById('inputTopic').value   = '';
+    document.getElementById('inputSummary').value = '';
+    document.getElementById('inputObstacle').value = '';
+
+    renderReports();
+    updateStats();
+    showToast('Laporan berhasil disimpan!', '✅');
+  }
+
+  // ─── DELETE REPORT ────────────────────────────────────────────────────────────
+  function deleteReport(id) {
+    if (!confirm('Hapus laporan ini?')) return;
+    const reports = getReports().filter(r => r.id !== id);
+    setReports(reports);
+    renderReports();
+    updateStats();
+    showToast('Laporan dihapus.', '🗑️');
+  }
+
+  // ─── EDIT REPORT ─────────────────────────────────────────────────────────────
+  function editReport(id) {
+    const reports = getReports();
+    const report  = reports.find(r => r.id === id);
+    if (!report) return;
+
+    const card = document.getElementById('card-' + id);
+    card.innerHTML = `
+      <div class="edit-form">
+        <div class="form-group">
+          <label>📅 Tanggal</label>
+          <input type="date" id="edit-date-${id}" value="${report.date}" />
+        </div>
+        <div class="form-group">
+          <label>📚 Topik</label>
+          <input type="text" id="edit-topic-${id}" value="${escapeHTML(report.topic)}" />
+        </div>
+        <div class="form-group">
+          <label>📝 Rangkuman</label>
+          <textarea id="edit-summary-${id}" rows="4">${escapeHTML(report.summary)}</textarea>
+        </div>
+        <div class="form-group">
+          <label>🚧 Kendala &amp; Solusi</label>
+          <textarea id="edit-obstacle-${id}" rows="3">${escapeHTML(report.obstacle)}</textarea>
+        </div>
+        <div class="edit-actions">
+          <button class="btn btn-save-edit" onclick="saveEdit('${id}')">✅ Simpan Perubahan</button>
+          <button class="btn btn-edit" onclick="renderReports()">✕ Batal</button>
+        </div>
+      </div>
+    `;
+  }
+
+  function saveEdit(id) {
+    const date     = document.getElementById(`edit-date-${id}`).value.trim();
+    const topic    = document.getElementById(`edit-topic-${id}`).value.trim();
+    const summary  = document.getElementById(`edit-summary-${id}`).value.trim();
+    const obstacle = document.getElementById(`edit-obstacle-${id}`).value.trim();
+
+    if (!date || !topic) {
+      showToast('Tanggal dan Topik wajib diisi!', '⚠️');
+      return;
+    }
+
+    const reports = getReports().map(r =>
+      r.id === id ? { ...r, date, topic, summary, obstacle } : r
+    );
+    setReports(reports);
+    renderReports();
+    updateStats();
+    showToast('Laporan diperbarui!', '✏️');
+  }
+
+  // ─── FORMAT DATE ─────────────────────────────────────────────────────────────
+  function formatDate(dateStr) {
+    if (!dateStr) return '-';
+    const [y, m, d] = dateStr.split('-');
+    const months = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
+    const days   = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
+    const dt = new Date(+y, +m - 1, +d);
+    return `${days[dt.getDay()]}, ${+d} ${months[+m - 1]} ${y}`;
+  }
+
+  // ─── ESCAPE HTML ─────────────────────────────────────────────────────────────
+  function escapeHTML(str) {
+    return (str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  // ─── RENDER REPORTS ──────────────────────────────────────────────────────────
+  function renderReports() {
+    const query   = (document.getElementById('searchInput').value || '').toLowerCase();
+    const reports = getReports().filter(r =>
+      !query ||
+      r.topic.toLowerCase().includes(query) ||
+      r.summary.toLowerCase().includes(query) ||
+      r.date.includes(query)
+    );
+
+    const container = document.getElementById('reportsList');
+
+    if (reports.length === 0) {
+      container.innerHTML = `
+        <div class="empty-state">
+          <div class="empty-icon">📭</div>
+          <p>${query ? 'Tidak ada laporan yang cocok dengan pencarian.' : 'Belum ada laporan. Tambahkan laporan pertamamu!'}</p>
+        </div>
+      `;
+      return;
+    }
+
+    container.innerHTML = reports.map((r, idx) => `
+      <div class="report-card" id="card-${r.id}">
+        <div class="report-card-header">
+          <div class="report-meta">
+            <div class="report-date">📅 ${formatDate(r.date)} &nbsp;·&nbsp; #${getReports().findIndex(x => x.id === r.id) + 1}</div>
+            <div class="report-topic">${escapeHTML(r.topic)}</div>
+          </div>
+          <div class="report-card-actions">
+            <button class="btn btn-edit" onclick="editReport('${r.id}')">✏️ Edit</button>
+            <button class="btn btn-danger" onclick="deleteReport('${r.id}')">🗑️</button>
+          </div>
+        </div>
+
+        ${r.summary ? `
+          <div>
+            <div class="report-section-title">📝 Rangkuman</div>
+            <div class="report-text">${escapeHTML(r.summary)}</div>
+          </div>
+        ` : ''}
+
+        ${r.summary && r.obstacle ? '<div class="report-divider"></div>' : ''}
+
+        ${r.obstacle ? `
+          <div>
+            <div class="report-section-title">🚧 Kendala &amp; Solusi</div>
+            <div class="report-text">${escapeHTML(r.obstacle)}</div>
+          </div>
+        ` : ''}
+      </div>
+    `).join('');
+  }
+
+  // ─── MARKDOWN EXPORT ─────────────────────────────────────────────────────────
+  function generateMarkdown() {
+    const reports = getReports();
+    if (reports.length === 0) return '> Belum ada laporan yang tersimpan.';
+
+    const header = `# 📓 Daily Learning Report — RevoU Coding Camp\n\n> Dokumentasi harian proses belajar di RevoU.\n\n---\n\n`;
+
+    const body = [...reports].reverse().map((r, idx) => {
+      const no = idx + 1;
+      const lines = [
+        `## ${no}. ${r.topic}`,
+        `**📅 Tanggal:** ${formatDate(r.date)}`,
+        '',
+      ];
+      if (r.summary) {
+        lines.push('### 📝 Rangkuman Pembelajaran');
+        lines.push(r.summary);
+        lines.push('');
+      }
+      if (r.obstacle) {
+        lines.push('### 🚧 Kendala & Solusi');
+        lines.push(r.obstacle);
+        lines.push('');
+      }
+      lines.push('---');
+      lines.push('');
+      return lines.join('\n');
+    }).join('\n');
+
+    const footer = `*Dibuat dengan [Daily Report — RevoU CAM](daily-report.html)*\n`;
+    return header + body + footer;
+  }
+
+  function openExportModal() {
+    document.getElementById('mdOutput').value = generateMarkdown();
+    document.getElementById('exportModal').classList.remove('hidden');
+  }
+
+  function closeExportModal(e) {
+    if (!e || e.target === document.getElementById('exportModal'))
+      document.getElementById('exportModal').classList.add('hidden');
+  }
+
+  function copyMarkdown() {
+    const text = document.getElementById('mdOutput').value;
+    navigator.clipboard.writeText(text)
+      .then(() => showToast('Markdown berhasil disalin!', '📋'))
+      .catch(() => {
+        document.getElementById('mdOutput').select();
+        document.execCommand('copy');
+        showToast('Markdown disalin (fallback).', '📋');
+      });
+  }
+
+  function downloadMarkdown() {
+    const text = document.getElementById('mdOutput').value;
+    const blob = new Blob([text], { type: 'text/markdown' });
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    a.href     = url;
+    a.download = 'learning-report.md';
+    a.click();
+    URL.revokeObjectURL(url);
+    showToast('File .md diunduh!', '⬇️');
+  }
+
+  // ─── KEYBOARD SHORTCUTS ──────────────────────────────────────────────────────
+  document.addEventListener('keydown', e => {
+    // Esc menutup modal
+    if (e.key === 'Escape') document.getElementById('exportModal').classList.add('hidden');
+    // Ctrl+Enter simpan laporan saat focus di form
+    if (e.ctrlKey && e.key === 'Enter') {
+      const active = document.activeElement;
+      const inForm = active && (active.closest('#formCard'));
+      if (inForm) saveReport();
+    }
+  });
+
+  // ─── INIT ─────────────────────────────────────────────────────────────────────
+  document.addEventListener('DOMContentLoaded', () => {
+    // Set default tanggal hari ini
+    const today = new Date();
+    const yyyy  = today.getFullYear();
+    const mm    = String(today.getMonth() + 1).padStart(2, '0');
+    const dd    = String(today.getDate()).padStart(2, '0');
+    document.getElementById('inputDate').value = `${yyyy}-${mm}-${dd}`;
+
+    renderReports();
+    updateStats();
+  });
+</script>
+</body>
+</html>
